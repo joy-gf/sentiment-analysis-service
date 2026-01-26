@@ -4,8 +4,11 @@ FastAPI application for sentiment analysis microservice
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.models import AnalysisRequest, SentimentResult, HealthResponse
+from app.models import AnalysisRequest, SentimentResult, EnhancedSentimentResult, HealthResponse
 from app.analyzer import get_analyzer
+from app.emotion_detector import EmotionDetector
+from app.keyword_extractor import KeywordExtractor
+from app.alert_generator import AlertGenerator
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -86,6 +89,66 @@ async def analyze_sentiment(request: AnalysisRequest):
     except Exception as e:
         logger.error(f"Analysis failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+
+@app.post("/analyze/enhanced", response_model=EnhancedSentimentResult)
+async def analyze_sentiment_enhanced(request: AnalysisRequest):
+    """
+    Analyze sentiment with enhanced features: emotion detection, keywords, and alerts
+
+    Args:
+        request: AnalysisRequest with text to analyze
+
+    Returns:
+        EnhancedSentimentResult with sentiment, emotion, keywords and alerts
+    """
+    try:
+        # Análisis de sentimiento base
+        analyzer = get_analyzer()
+        base_result = analyzer.analyze(request.text)
+
+        # Detectar emoción predominante
+        emotion_detector = EmotionDetector()
+        emotion = emotion_detector.detect_emotion(
+            request.text,
+            base_result.sentimiento_general
+        )
+
+        # Extraer palabras clave
+        keyword_extractor = KeywordExtractor()
+        keywords = keyword_extractor.extract_keywords(request.text, top_n=8)
+
+        # Generar alertas
+        alert_generator = AlertGenerator()
+        alerts = alert_generator.generate_alerts(
+            request.text,
+            base_result.sentimiento_general,
+            emotion,
+            base_result.confianza
+        )
+
+        logger.info(
+            f"Enhanced analysis complete - "
+            f"Sentiment: {base_result.sentimiento_general}, "
+            f"Emotion: {emotion}, "
+            f"Alerts: {len(alerts)}"
+        )
+
+        return EnhancedSentimentResult(
+            sentimiento_general=base_result.sentimiento_general,
+            score_positivo=base_result.score_positivo,
+            score_negativo=base_result.score_negativo,
+            score_neutral=base_result.score_neutral,
+            confianza=base_result.confianza,
+            modelo_usado=base_result.modelo_usado,
+            emocion_predominante=emotion,
+            palabras_clave=keywords,
+            alertas=alerts
+        )
+
+    except Exception as e:
+        logger.error(f"Enhanced analysis failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Enhanced analysis failed: {str(e)}")
 
 
 if __name__ == "__main__":

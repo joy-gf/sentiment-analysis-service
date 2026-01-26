@@ -2,7 +2,7 @@
 Pydantic models for request/response validation
 """
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List, Dict
 
 
 class AnalysisRequest(BaseModel):
@@ -37,6 +37,37 @@ class SentimentResult(BaseModel):
                 "score_neutral": 0.05,
                 "confianza": 0.85,
                 "modelo_usado": "pysentimiento/robertuito-sentiment-analysis"
+            }
+        }
+
+
+class EnhancedSentimentResult(BaseModel):
+    """Enhanced response with emotion, keywords and alerts"""
+    sentimiento_general: str = Field(..., description="Overall sentiment: positivo, negativo, neutral")
+    score_positivo: float = Field(..., ge=0, le=1, description="Positive sentiment score")
+    score_negativo: float = Field(..., ge=0, le=1, description="Negative sentiment score")
+    score_neutral: float = Field(..., ge=0, le=1, description="Neutral sentiment score")
+    confianza: float = Field(..., ge=0, le=1, description="Confidence score")
+    modelo_usado: str = Field(..., description="Model used")
+    emocion_predominante: str = Field(..., description="Predominant emotion detected")
+    palabras_clave: List[Dict[str, any]] = Field(..., description="Key words found")
+    alertas: List[Dict[str, str]] = Field(..., description="Alerts detected")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "sentimiento_general": "positivo",
+                "score_positivo": 0.85,
+                "score_negativo": 0.10,
+                "score_neutral": 0.05,
+                "confianza": 0.85,
+                "modelo_usado": "pysentimiento/robertuito-sentiment-analysis",
+                "emocion_predominante": "Feliz",
+                "palabras_clave": [
+                    {"word": "proyecto", "frequency": 3},
+                    {"word": "logré", "frequency": 2}
+                ],
+                "alertas": []
             }
         }
 
