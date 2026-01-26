@@ -2,7 +2,7 @@
 Pydantic models for request/response validation
 """
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 
 
 class AnalysisRequest(BaseModel):
@@ -50,7 +50,7 @@ class EnhancedSentimentResult(BaseModel):
     confianza: float = Field(..., ge=0, le=1, description="Confidence score")
     modelo_usado: str = Field(..., description="Model used")
     emocion_predominante: str = Field(..., description="Predominant emotion detected")
-    palabras_clave: List[Dict[str, any]] = Field(..., description="Key words found")
+    palabras_clave: List[Dict[str, Any]] = Field(..., description="Key words found")
     alertas: List[Dict[str, str]] = Field(..., description="Alerts detected")
 
     class Config:
