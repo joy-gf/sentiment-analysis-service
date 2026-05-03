@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: sentiment-analysis-service
+    runtime: docker
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_NAME
+        value: pysentimiento/robertuito-sentiment-analysis
+      - key: DEVICE
+        value: cpu
+      - key: CORS_ORIGINS
+        sync: false  # Set manually in Render dashboard (your Netlify domain)

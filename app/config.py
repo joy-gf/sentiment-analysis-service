@@ -14,7 +14,7 @@ class Settings:
 
     # ML Model
     MODEL_NAME: str = os.getenv("MODEL_NAME", "pysentimiento/robertuito-sentiment-analysis")
-    DEVICE: str = os.getenv("DEVICE", "cpu")  # Use "cuda" if GPU available
+    HF_API_TOKEN: str = os.getenv("HF_API_TOKEN", "")
 
     # CORS
     CORS_ORIGINS: list = os.getenv(

@@ -5,10 +5,8 @@ pydantic==2.5.3
 pydantic-settings==2.1.0
 python-dotenv==1.0.0
 
-# ML/NLP - Hugging Face Transformers (FREE & Open Source)
-transformers==4.37.0
-torch==2.1.2
-sentencepiece==0.1.99
+# HTTP client for HuggingFace Inference API
+requests==2.31.0
 
 # Utilities
 python-multipart==0.0.6
