@@ -1,8 +1,12 @@
 -r requirements.txt
 
 # Local model inference
-# numpy pinned to <2 because torch 2.1.x was compiled against NumPy 1.x ABI
+# numpy<2: torch 2.1.x was compiled against NumPy 1.x ABI
+# accelerate==0.27.2: transformers 4.37.0 passes dispatch_batches to Accelerator(),
+#   which was removed in accelerate 0.28.0 — pin to the version current at release
 numpy<2.0.0
+accelerate==0.27.2
 transformers==4.37.0
 torch==2.1.2
 sentencepiece==0.1.99
+pysentimiento

@@ -35,17 +35,13 @@ class SentimentAnalyzer:
 
     def _load_local_model(self):
         try:
-            from transformers import pipeline as hf_pipeline
-            logger.info(f"Loading local model: {self.model_name}")
-            self.pipeline = hf_pipeline(
-                "sentiment-analysis",
-                model=self.model_name,
-                device=-1,
-            )
-            logger.info("Local model loaded successfully")
+            from pysentimiento import create_analyzer
+            logger.info(f"Loading pysentimiento analyzer: {self.model_name}")
+            self.pipeline = create_analyzer(task="sentiment", lang="es")
+            logger.info("pysentimiento analyzer loaded successfully")
         except ImportError:
             raise RuntimeError(
-                "transformers/torch not installed. "
+                "pysentimiento not installed. "
                 "Run: pip install -r requirements-local.txt"
             )
 
@@ -77,12 +73,8 @@ class SentimentAnalyzer:
     def _analyze_local(self, text: str) -> SentimentResult:
         if not self.pipeline:
             raise RuntimeError("Local model not loaded")
-        result = self.pipeline(text)[0]
-        label = result["label"]
-        confidence = result["score"]
-        scores = {"POS": 0.0, "NEG": 0.0, "NEU": 0.0}
-        scores[label] = confidence
-        items = [{"label": k, "score": v} for k, v in scores.items()]
+        result = self.pipeline.predict(text)
+        items = [{"label": k, "score": v} for k, v in result.probas.items()]
         return self._build_result(items)
 
     def _build_result(self, items: list) -> SentimentResult:
