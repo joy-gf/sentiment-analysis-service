@@ -1,3 +1,13 @@
+---
+title: Sentiment Analysis Service
+sdk: docker
+app_port: 8000
+pinned: false
+short_description: API de análisis de sentimiento en español (RoBERTuito)
+models:
+  - pysentimiento/robertuito-sentiment-analysis
+---
+
 # Servicio de Análisis de Sentimiento
 
 Servicio que analiza si un texto es positivo, negativo o neutral. Se usa para el Diario Emocional.

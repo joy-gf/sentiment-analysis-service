@@ -1,11 +1,20 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+RUN useradd -m -u 1000 user
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH \
+    HF_HOME=/home/user/.cache/huggingface \
+    PYTHONUNBUFFERED=1
 
-COPY . .
+WORKDIR $HOME/app
+
+COPY --chown=user requirements.txt requirements-local.txt ./
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements-local.txt
+
+COPY --chown=user . .
 
 EXPOSE 8000
 

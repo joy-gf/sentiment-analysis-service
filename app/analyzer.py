@@ -1,7 +1,9 @@
 """
 Sentiment analysis logic.
-- If HF_API_TOKEN is set: uses HuggingFace Inference API (lightweight, for cloud demo).
-- If HF_API_TOKEN is not set: loads model locally via transformers (for local development).
+- Default: loads the model locally via transformers (used in local dev and on HF Spaces deploy).
+- Optional: if HF_API_TOKEN is set, calls the HuggingFace Inference Providers router.
+  Note: pysentimiento/robertuito-sentiment-analysis is not currently served by any provider,
+  so the API path only works if MODEL_NAME is switched to a provider-supported model.
 """
 import logging
 from app.config import settings
@@ -26,7 +28,7 @@ class SentimentAnalyzer:
     def _setup_api(self):
         import requests as _requests
         self._requests = _requests
-        self._api_url = f"https://api-inference.huggingface.co/models/{self.model_name}"
+        self._api_url = f"https://router.huggingface.co/hf-inference/models/{self.model_name}"
         self._headers = {"Authorization": f"Bearer {settings.HF_API_TOKEN}"}
         self.pipeline = True  # flag for health check
         logger.info(f"Analyzer ready (HuggingFace API): {self.model_name}")
